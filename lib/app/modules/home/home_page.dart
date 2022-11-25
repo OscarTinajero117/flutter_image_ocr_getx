@@ -60,10 +60,12 @@ class HomePage extends GetView<HomeController> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             SquaredButton(
-                              iconButton: Icons.image,
-                              onPressed: () async => await controller
-                                  .getImage(ImageSource.gallery),
-                              textButton: 'Gallery',
+                              iconButton: Icons.camera,
+                              onPressed: () => Get.to(
+                                () => const CameraPage(),
+                                transition: Transition.downToUp,
+                              ),
+                              textButton: 'Camera (Camera\'s plugin)',
                             ),
                             SquaredButton(
                               iconButton: Icons.camera_alt,
@@ -72,12 +74,10 @@ class HomePage extends GetView<HomeController> {
                               textButton: 'Camera (Image_Picker\'s plugin)',
                             ),
                             SquaredButton(
-                              iconButton: Icons.camera,
-                              onPressed: () => Get.to(
-                                () => const CameraPage(),
-                                transition: Transition.downToUp,
-                              ),
-                              textButton: 'Camera (Camera\'s plugin)',
+                              iconButton: Icons.image,
+                              onPressed: () async => await controller
+                                  .getImage(ImageSource.gallery),
+                              textButton: 'Gallery',
                             ),
                           ],
                         ),
