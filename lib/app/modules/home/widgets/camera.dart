@@ -75,7 +75,7 @@ class FocusRectangle extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.all(1.5.hp),
                 child: AspectRatio(
-                  aspectRatio: (3.0 / 1),
+                  aspectRatio: (2.0 / 1),
                   child: Container(
                     decoration: BoxDecoration(
                       border: Border.all(

@@ -73,13 +73,10 @@ class HomePage extends GetView<HomeController> {
                             ),
                             SquaredButton(
                               iconButton: Icons.camera,
-                              onPressed: () async {
-                                await controller.initCameraPlugin();
-                                Get.to(
-                                  () => const CameraPage(),
-                                  transition: Transition.downToUp,
-                                );
-                              },
+                              onPressed: () => Get.to(
+                                () => const CameraPage(),
+                                transition: Transition.downToUp,
+                              ),
                               textButton: 'Camera (Camera\'s plugin)',
                             ),
                           ],

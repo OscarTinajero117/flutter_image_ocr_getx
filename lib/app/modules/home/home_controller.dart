@@ -20,15 +20,15 @@ class HomeController extends GetxController {
     final propieties = await FlutterNativeImage.getImageProperties(fileName);
     final width = propieties.width!;
     final height = propieties.height!;
-    final centerHight = height / 2;
+    // final centerHight = height / 2;
     // final offset = (height - width) / 2;
 
     final croppedFile = await FlutterNativeImage.cropImage(
       fileName,
       0,
-      240,
+      height - width,
       width,
-      centerHight.round() - width,
+      height - width,
     );
 
     return croppedFile.path;
@@ -36,17 +36,11 @@ class HomeController extends GetxController {
 
   Future<void> getImageCamera() async {
     loading.value = true;
-    try {
-      final tmpPhoto = await cameraController.takePicture();
-      Get.back();
-      await cameraController.dispose();
-      imageFile = tmpPhoto;
-      final ocrPhoto = await _resizePhoto(tmpPhoto.path);
-      await getRecognisedText(ocrPhoto);
-    } catch (e) {
-      // await cameraController.dispose();
-      log('$e');
-    }
+    final tmpPhoto = await cameraController.takePicture();
+    Get.back();
+    imageFile = tmpPhoto;
+    final ocrPhoto = await _resizePhoto(tmpPhoto.path);
+    await getRecognisedText(ocrPhoto);
 
     loading.value = false;
   }
@@ -81,7 +75,6 @@ class HomeController extends GetxController {
   }
 
   Future<void> initCameraPlugin() async {
-    loading.value = true;
     cameraDescription.value = await availableCameras();
     cameraController =
         CameraController(cameraDescription[0], ResolutionPreset.medium);
@@ -90,6 +83,19 @@ class HomeController extends GetxController {
     if (cameraController.value.hasError) {
       log('Error');
     }
+  }
+
+  @override
+  void onInit() async {
+    loading.value = true;
+    await initCameraPlugin();
     loading.value = false;
+    super.onInit();
+  }
+
+  @override
+  void onClose() async {
+    await cameraController.dispose();
+    super.onClose();
   }
 }
