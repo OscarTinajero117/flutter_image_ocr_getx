@@ -13,6 +13,7 @@ void main() {
     initialRoute: Routes.HOME,
     theme: ThemeData(
       primaryColor: Colors.green,
+      primarySwatch: Colors.green,
     ),
     // defaultTransition: Transition.fade,
     initialBinding: HomeBinding(),
