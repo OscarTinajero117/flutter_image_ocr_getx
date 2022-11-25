@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 
 class HomeController extends GetxController {
   final loading = true.obs;
+  final flashMode = false.obs;
   final scanning = false.obs;
   final extractText = ''.obs;
   XFile? imageFile;
@@ -15,6 +16,12 @@ class HomeController extends GetxController {
   final cameraDescription = <CameraDescription>[].obs;
 
   late final CameraController cameraController;
+
+  Future<void> flashCamera() async {
+    flashMode.value = !flashMode.value;
+    await cameraController
+        .setFlashMode(flashMode.value ? FlashMode.always : FlashMode.off);
+  }
 
   Future<String> _resizePhoto(String fileName) async {
     final propieties = await FlutterNativeImage.getImageProperties(fileName);
@@ -76,10 +83,13 @@ class HomeController extends GetxController {
 
   Future<void> initCameraPlugin() async {
     cameraDescription.value = await availableCameras();
-    cameraController =
-        CameraController(cameraDescription[0], ResolutionPreset.medium);
+    cameraController = CameraController(
+      cameraDescription[0],
+      ResolutionPreset.medium,
+      enableAudio: false,
+    );
     await cameraController.initialize();
-
+    await cameraController.setFlashMode(FlashMode.off);
     if (cameraController.value.hasError) {
       log('Error');
     }

@@ -44,9 +44,25 @@ class CameraPage extends GetView<HomeController> {
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async => await controller.getImageCamera(),
-        child: const Icon(Icons.camera),
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Obx(
+            () => FloatingActionButton(
+              heroTag: 'btnFlash',
+              onPressed: () async => await controller.flashCamera(),
+              child: Icon(
+                controller.flashMode.value ? Icons.flash_on : Icons.flash_off,
+              ),
+            ),
+          ),
+          SizedBox(width: 2.0.wp),
+          FloatingActionButton(
+            heroTag: 'btnCamera',
+            onPressed: () async => await controller.getImageCamera(),
+            child: const Icon(Icons.camera),
+          ),
+        ],
       ),
     );
   }
