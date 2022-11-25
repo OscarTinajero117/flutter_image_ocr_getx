@@ -1,12 +1,55 @@
+import 'dart:developer';
+
+import 'package:camera/camera.dart';
+import 'package:flutter_native_image/flutter_native_image.dart';
 import 'package:get/get.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:image_picker/image_picker.dart';
 
 class HomeController extends GetxController {
+  final loading = true.obs;
   final scanning = false.obs;
   final extractText = ''.obs;
-
   XFile? imageFile;
+
+  final cameraDescription = <CameraDescription>[].obs;
+
+  late final CameraController cameraController;
+
+  Future<String> _resizePhoto(String fileName) async {
+    final propieties = await FlutterNativeImage.getImageProperties(fileName);
+    final width = propieties.width!;
+    final height = propieties.height!;
+    final centerHight = height / 2;
+    // final offset = (height - width) / 2;
+
+    final croppedFile = await FlutterNativeImage.cropImage(
+      fileName,
+      0,
+      240,
+      width,
+      centerHight.round() - width,
+    );
+
+    return croppedFile.path;
+  }
+
+  Future<void> getImageCamera() async {
+    loading.value = true;
+    try {
+      final tmpPhoto = await cameraController.takePicture();
+      Get.back();
+      await cameraController.dispose();
+      imageFile = tmpPhoto;
+      final ocrPhoto = await _resizePhoto(tmpPhoto.path);
+      await getRecognisedText(ocrPhoto);
+    } catch (e) {
+      // await cameraController.dispose();
+      log('$e');
+    }
+
+    loading.value = false;
+  }
 
   Future<void> getImage(ImageSource source) async {
     scanning.value = true;
@@ -14,7 +57,7 @@ class HomeController extends GetxController {
       final pickedImage = await ImagePicker().pickImage(source: source);
       if (pickedImage != null) {
         imageFile = pickedImage;
-        await getRecognisedText(pickedImage);
+        await getRecognisedText(pickedImage.path);
       }
     } catch (e) {
       extractText.value = 'Error ocurred while scanning\n\n $e';
@@ -23,8 +66,8 @@ class HomeController extends GetxController {
     }
   }
 
-  Future<void> getRecognisedText(XFile image) async {
-    final inputImage = InputImage.fromFilePath(image.path);
+  Future<void> getRecognisedText(String imagePath) async {
+    final inputImage = InputImage.fromFilePath(imagePath);
     final textRecognizer = GoogleMlKit.vision.textRecognizer();
     final recognisedText = await textRecognizer.processImage(inputImage);
     await textRecognizer.close();
@@ -35,5 +78,18 @@ class HomeController extends GetxController {
       }
     }
     scanning.value = false;
+  }
+
+  Future<void> initCameraPlugin() async {
+    loading.value = true;
+    cameraDescription.value = await availableCameras();
+    cameraController =
+        CameraController(cameraDescription[0], ResolutionPreset.medium);
+    await cameraController.initialize();
+
+    if (cameraController.value.hasError) {
+      log('Error');
+    }
+    loading.value = false;
   }
 }

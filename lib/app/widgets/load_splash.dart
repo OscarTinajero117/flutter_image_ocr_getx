@@ -8,7 +8,7 @@ class LoadSplash extends StatelessWidget {
 
   const LoadSplash({
     Key? key,
-    required this.mensaje,
+    this.mensaje = 'Loading',
     this.posicion = MainAxisAlignment.center,
     this.tamMensaje = 20.0,
     this.separacion = 40.0,

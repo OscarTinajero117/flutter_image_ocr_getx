@@ -4,78 +4,99 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../widgets/load_splash.dart';
 import '/app/core/values/responsive.dart';
 import 'home_controller.dart';
+import 'widgets/camera.dart';
 
 class HomePage extends GetView<HomeController> {
   const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Image OCR'),
-        centerTitle: true,
-        elevation: 2.0.wp,
-      ),
-      body: Container(
-        margin: EdgeInsets.all(1.0.hp),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Obx(
-                () => controller.scanning.value
-                    ? const CircularProgressIndicator.adaptive()
-                    : const SizedBox(),
+    return Obx(
+      () => controller.loading.value
+          ? const LoadSplash()
+          : Scaffold(
+              appBar: AppBar(
+                title: const Text('Image OCR'),
+                centerTitle: true,
+                elevation: 2.0.wp,
               ),
-              Obx(
-                () => !controller.scanning.value && controller.imageFile == null
-                    ? Container(
-                        height: 75.0.wp,
-                        width: 75.0.wp,
-                        color: Colors.grey.shade300,
-                        child: Center(
-                          child: Icon(
-                            Icons.camera_alt_outlined,
-                            size: 20.0.sp,
-                          ),
+              body: Container(
+                margin: EdgeInsets.all(1.0.hp),
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Obx(
+                        () => controller.scanning.value
+                            ? const CircularProgressIndicator.adaptive()
+                            : const SizedBox(),
+                      ),
+                      Obx(
+                        () => !controller.scanning.value &&
+                                controller.imageFile == null
+                            ? Container(
+                                height: 75.0.wp,
+                                width: 75.0.wp,
+                                color: Colors.grey.shade300,
+                                child: Center(
+                                  child: Icon(
+                                    Icons.camera_alt_outlined,
+                                    size: 20.0.sp,
+                                  ),
+                                ),
+                              )
+                            : controller.imageFile != null
+                                ? Image.file(
+                                    File(controller.imageFile!.path),
+                                    width: 75.0.wp,
+                                  )
+                                : const SizedBox(),
+                      ),
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SquaredButton(
+                              iconButton: Icons.image,
+                              onPressed: () async => await controller
+                                  .getImage(ImageSource.gallery),
+                              textButton: 'Gallery',
+                            ),
+                            SquaredButton(
+                              iconButton: Icons.camera_alt,
+                              onPressed: () async =>
+                                  await controller.getImage(ImageSource.camera),
+                              textButton: 'Camera (Image_Picker\'s plugin)',
+                            ),
+                            SquaredButton(
+                              iconButton: Icons.camera,
+                              onPressed: () async {
+                                await controller.initCameraPlugin();
+                                Get.to(
+                                  () => const CameraPage(),
+                                  transition: Transition.downToUp,
+                                );
+                              },
+                              textButton: 'Camera (Camera\'s plugin)',
+                            ),
+                          ],
                         ),
+                      ),
+                      SizedBox(height: 5.0.hp),
+                      SizedBox(
+                        child: Obx(() => Text(
+                              controller.extractText.value,
+                              style: TextStyle(fontSize: 20.0.sp),
+                            )),
                       )
-                    : controller.imageFile != null
-                        ? Image.file(
-                            File(controller.imageFile!.path),
-                            width: 75.0.wp,
-                          )
-                        : const SizedBox(),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SquaredButton(
-                    iconButton: Icons.image,
-                    onPressed: () async =>
-                        await controller.getImage(ImageSource.gallery),
-                    textButton: 'Gallery',
+                    ],
                   ),
-                  SquaredButton(
-                    iconButton: Icons.camera_alt,
-                    onPressed: () async =>
-                        await controller.getImage(ImageSource.camera),
-                    textButton: 'Camera',
-                  ),
-                ],
+                ),
               ),
-              SizedBox(height: 5.0.hp),
-              SizedBox(
-                child: Obx(() => Text(
-                      controller.extractText.value,
-                      style: TextStyle(fontSize: 20.0.sp),
-                    )),
-              )
-            ],
-          ),
-        ),
-      ),
+            ),
     );
   }
 }
@@ -118,6 +139,7 @@ class SquaredButton extends StatelessWidget {
               ),
               Text(
                 textButton,
+                textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 11.0.sp,
                   color: Colors.grey.shade600,
