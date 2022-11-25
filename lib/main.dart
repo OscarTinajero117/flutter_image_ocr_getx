@@ -11,7 +11,9 @@ void main() {
     title: 'Image OCR',
     debugShowCheckedModeBanner: false,
     initialRoute: Routes.HOME,
-    theme: ThemeData.light(),
+    theme: ThemeData(
+      primaryColor: Colors.green,
+    ),
     // defaultTransition: Transition.fade,
     initialBinding: HomeBinding(),
     getPages: AppPages.pages,
