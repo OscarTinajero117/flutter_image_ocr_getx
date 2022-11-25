@@ -29,7 +29,7 @@ class CameraPage extends GetView<HomeController> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                margin: EdgeInsets.only(top: 3.0.hp),
+                margin: EdgeInsets.only(top: 10.0.hp),
                 child: Text(
                   'Place your water meter within the box',
                   style: TextStyle(
